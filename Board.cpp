@@ -1,9 +1,52 @@
 #include "Board.h"
-#include <stdexcept>
-#include <cstdlib>
-#include <ctime>
 
+vector<int8_t> &Board::get_position() {
+	return position;
+}
 
+vector<uint8_t> &Board::get_available_dice() {
+	return available_dice;
+}
+
+pair<uint8_t,uint8_t> &Board::get_dice() {
+	return dice;
+}
+
+pair<uint8_t, uint8_t> &Board::get_score() {
+	return score;
+}
+
+uint8_t Board::get_match_points() {
+	return match_points;
+}
+
+uint8_t Board::get_stake() {
+	return stake;
+}
+
+bool Board::get_doubling_dice_owner() {
+	return doubling_dice_owner;
+}
+
+bool Board::get_active_player() {
+	return active_player;
+}
+
+void Board::render(SDL_Renderer *renderer) {
+	SDL_Surface *surface = IMG_Load("png/board.png");
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
+	SDL_Rect rect = {0, 0, 1020, 1020};
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_SetRenderDrawColor(renderer, 222, 49, 99, 255 );
+	filledCircleColor(renderer, 95, 95, 50, 0xFF00FFFF);
+	
+	SDL_RenderPresent(renderer);
+	
+	SDL_DestroyTexture(texture);
+}
+
+/*
 void Board::move(int8_t source, int8_t destination) {
 //client doesn't need to worry about how we implement source and destination internally.
 //for both black and white, 1 is the first point of home, 24 is the last one.
@@ -305,4 +348,7 @@ void Board::roll_dice() {
 	}else {
 		available_moves = {dice.first, dice.second};
 	}
+}
+
+*/
 

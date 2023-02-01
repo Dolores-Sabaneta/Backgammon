@@ -3,6 +3,7 @@
 	
 #include <SDL2/SDL.h>
 #include <fmt/core.h>
+#include "Board.h"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ class Backgammon {
 		bool Running {true};
 		SDL_Window *window{NULL};
 		SDL_Renderer *renderer {NULL};
-		
+
 	public:
 		int OnExecute();
 		bool OnInit();

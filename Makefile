@@ -1,5 +1,5 @@
-output: main.o OnExecute.o OnInit.o OnEvent.o OnLoop.o OnRender.o OnCleanup.o
-	g++ main.o OnExecute.o OnInit.o OnEvent.o OnLoop.o OnRender.o OnCleanup.o -lfmt -lSDL2 -o main
+output: main.o OnExecute.o OnInit.o OnEvent.o OnLoop.o OnRender.o OnCleanup.o Board.o
+	g++ main.o OnExecute.o OnInit.o OnEvent.o OnLoop.o OnRender.o OnCleanup.o Board.o -lfmt -lSDL2 -lSDL2_image -lSDL2_gfx -o main
 	
 main.o: main.cpp Backgammon.h
 	g++ -c main.cpp
@@ -21,6 +21,9 @@ OnRender.o: OnRender.cpp
 	
 OnCleanup.o: OnCleanup.cpp
 	g++ -c OnCleanup.cpp
+
+Board.o: Board.cpp Board.h
+	g++ -c Board.cpp
 	
 open:
 	open main.cpp

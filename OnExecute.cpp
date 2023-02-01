@@ -14,11 +14,14 @@ int Backgammon::OnExecute() {
 		}
 		OnLoop();
 		OnRender();
-		
+		/*
 		frameTime = SDL_GetTicks() - frameStart;
+		
 		if(frameDelay > frameTime) {
 			SDL_Delay(frameDelay - frameTime);
 		}
+		fmt::print("fps: {}\n", 1000 / (SDL_GetTicks() - frameStart));
+		*/
 	}
 	OnCleanup();
 	return 0;

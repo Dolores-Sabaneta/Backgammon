@@ -67,6 +67,13 @@ void Board::draw_position(surface_t &surface, void *mem) {
 	surface.commit();
 }
 
-void Board_hover_checker(int x, int y, int last_hover_x, int last_hover_y, surface_t &surface, void *mem) {
+void Board::hover_checker(int x, int y, int last_hover_x, int last_hover_y, surface_t &surface, void *mem) {
+
+	fmt::print("x: {}, y: {}\n", x, y);
+	for(int i = 0; i < 80; i++) {
+		memcpy(static_cast<uint32_t*>(mem) + width * (y + i) + x, image[y + i] + x * 4, 80 * 4);
+	}
+	surface.damage(x, y, 80, 80);
+	surface.commit();
 	
 }

@@ -66,9 +66,10 @@ private:
 	double cursor_y;
 	//0 = released, 1 = pressed
 	bool mouse_left;
-	
-	int last_hover_x;
-	int last_hover_y;
+	//0 = checker not hovering, 1 = checker hover
+	bool hover = false;
+	double last_hover_position_x;
+	double last_hover_position_y;
 	
 	Board board;
 	

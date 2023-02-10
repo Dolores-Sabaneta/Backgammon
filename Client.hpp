@@ -20,19 +20,22 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <fmt/core.h>
-
-#include "Board.hpp"
 #include <png.h>
-
 #include <cairomm/surface.h>
 #include <cairomm/context.h>
 
-//#include <cairo.h>
+#include "Board.hpp"
+#include "BoardView.hpp"
+#include "SharedMemory.hpp"
 
 using namespace wayland;
 
 class Client {
 private:
+	bool running;
+	
+	int width = 1080;
+	int height = 1080;
 	//global objects
 	display_t display;
 	registry_t registry;
@@ -46,32 +49,21 @@ private:
 	surface_t surface;
 	xdg_surface_t xdg_surface;
 	xdg_toplevel_t xdg_toplevel;
+	shm_pool_t pool;
 	buffer_t buffer;
 	pointer_t pointer;
 	cursor_image_t cursor_image;
 	buffer_t cursor_buffer;
 	surface_t cursor_surface;	
-	
-	bool running;
-	int fd;
-	void *mem = nullptr;
+	SharedMemory memory;
 	
 	void OnInit();
 	void OnEvent();
 	
-	int width = 1080;
-	int height = 1080;
-	
-	double cursor_x;
-	double cursor_y;
-	//0 = released, 1 = pressed
-	bool mouse_left;
-	//0 = checker not hovering, 1 = checker hover
-	bool hover = false;
-	double last_hover_position_x;
-	double last_hover_position_y;
-	
+	BoardView boardview;
 	Board board;
+	
+	double cur_x, cur_y;
 	
 public:
 	Client();

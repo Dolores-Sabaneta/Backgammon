@@ -11,14 +11,14 @@
 
 #include <cairomm/surface.h>
 #include <cairomm/context.h>
+#include "SharedMemory.hpp"
 
 using namespace wayland;
-
-class Board {
-private:	
-	std::vector<int8_t> position {2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0, 0};
-
+class BoardView {
+private:
+	png_bytep *image; //2D array of the image
+	png_uint_32 height, width;
 public:
-	Board();
-	std::vector<int8_t> &get_position();
+	BoardView();
+	void draw(std::vector<int8_t> &position, surface_t &surface, void *mem);
 };

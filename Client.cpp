@@ -1,9 +1,9 @@
 #include "Client.hpp"
 
-Client::Client() {
+Client::Client() : memory(width * height * 4){
 		OnInit();
 		OnEvent();
-		board.draw_position(surface, mem);
+		//board.draw();
 }
 
 void Client::run() {

@@ -61,10 +61,35 @@ void BoardView::draw(std::vector<int8_t> &position, surface_t &surface, void *me
 	surface.commit();
 }
 
+void BoardView::start_hover(std::vector<int8_t> &position, surface_t &surface, void *mem, int point, int checker, shm_t &shm, surface_t &hovering_surface) {
+	hovering = true;
+	fmt::print("a\n");
+	hovering_checker = new HoveringChecker(shm, hovering_surface);
+	fmt::print("b\n");
+	int x = 0;
+	int y = 0;
+	if(point < 13) {
+		y = 650;
+		point < 7 ? x = 1050 - point * 80 : x = 990 - point * 80;
+	}else {
+		y = 30;
+		point < 19 ? x = 30 + (point - 12) * 80 : x = 90 + (point - 12) * 80;
+	}
+	fmt::print("point: {}, checker: {}, x: {}, y: {}\n", point, checker, x, y);
+	/*
+	for(int i = 0; i < position[point - 1] * 80; i++) {
+		memcpy(static_cast<uint32_t *>(mem) + width * (i + y) + x, image[i + y] + x * 4, 80 * 4);
+	}
+	surface.damage(0,0,80,80);
+	surface.commit();
+	*/
+}
 
+void BoardView::stop_hover() {
+	hovering = false;
+	delete hovering_checker;
+}
 
-/*
-	Cairo::RefPtr<Cairo::ImageSurface> imageSurface = Cairo::ImageSurface::create((unsigned char *)mem, 			Cairo::FORMAT_ARGB32, width, height, stride);
-	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(imageSurface);
-	cr->(x, y, r, 0, 2 * M_PI);	
-*/
+bool BoardView::is_hovering() {
+	return hovering;
+}

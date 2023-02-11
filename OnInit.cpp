@@ -39,5 +39,5 @@ void Client::OnInit() {
 	cursor_image = cursor.image(0);
 	cursor_buffer = cursor_image.get_buffer();
 	cursor_surface = compositor.create_surface(); 
-	boardview.draw(board.get_position(), surface, memory.get_mem());
+	board_view.draw(board.get_position(), surface, memory.get_mem());
 }

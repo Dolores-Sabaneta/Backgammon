@@ -60,10 +60,11 @@ private:
 	void OnInit();
 	void OnEvent();
 	
-	BoardView boardview;
+	BoardView board_view;
 	Board board;
 	
 	double cur_x, cur_y;
+	bool pressed;
 	
 public:
 	Client();

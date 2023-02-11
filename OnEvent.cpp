@@ -11,20 +11,53 @@ void Client::OnEvent() {
 	pointer.on_button() = [&] (uint32_t serial, uint32_t /*unused*/, uint32_t button, pointer_button_state state) {      
 		if(button == BTN_LEFT && state == pointer_button_state::pressed) {
 			fmt::print("pressed\n");
-			double x, y;
+			double x = 0, y = 0; //converted coordinates
+			bool in = false;
+			//We convert coordinates to a line of points going from 1 to 24
 			if(cur_y < 1040 && cur_y > 640){
 				fmt::print("down\n");
-				cur_x <  
-				
+				y = -cur_y + 1040;
+				if(cur_x < 500 && cur_x > 20) {
+					in = true;
+					x = -cur_x + 980;
+				}else if(cur_x < 1040 && cur_x > 560) {
+					in = true;
+					x = -cur_x + 1040;
+				}
 			}else if(cur_y < 420 && cur_y > 20){
 				fmt::print("up\n");
-				y = abs(cur_y);
+					y = cur_y - 20;
+				if(cur_x < 500 && cur_x > 20) {
+					in = true;
+					x = cur_x + 940;
+				}else if(cur_x < 1040 && cur_x > 560) {
+					in = true;
+					x = cur_x + 880;
+				}
+			}
+			if(in) {
+				int point = x / 80 + 1;
+				int checker = y / 80 + 1;
+				double distance = sqrt(pow(point * 80 - 40 - x, 2) + pow(checker * 80 - 40 - y, 2));
+				//we click on the circular shape of a checker
+				if(distance < 40 && board.get_position()[point - 1] >= checker) {
+					fmt::print("checker: {}, point: {}, distance: {}\n", checker, point, distance);
+					surface_t hovering_surface;
+					board_view.start_hover(board.get_position(), surface, memory.get_mem(), point, checker, shm, hovering_surface);
+					
+				}
 			}
 		}else if(button == BTN_LEFT && state == pointer_button_state::released) {
 			fmt::print("released\n");
+			if(board_view.is_hovering()) {
+				board_view.stop_hover();
+			}
 		}
 	};
 	pointer.on_motion() = [&] (uint32_t, double x, double y) {
+		if(board_view.is_hovering()) {
+			fmt::print("hovering\n");
+		}
 		cur_x = x;
 		cur_y = y;
 	};

@@ -21,3 +21,7 @@ SharedMemory::SharedMemory(int size) : size{size} {
 	mem = mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if(mem == MAP_FAILED) throw std::runtime_error("mmap failed.");
 }
+
+SharedMemory::~SharedMemory() {
+	delete mem;
+}

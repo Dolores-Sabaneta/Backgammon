@@ -31,4 +31,5 @@ public:
 	int get_fd();
 	void *get_mem();
 	SharedMemory(int size);
+	~SharedMemory();
 };

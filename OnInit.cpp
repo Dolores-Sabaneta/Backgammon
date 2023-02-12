@@ -3,9 +3,11 @@
 void Client::OnInit() {
 	registry = display.get_registry();
 	registry.on_global() = [&] (uint32_t name, const std::string &interface, uint32_t version) {
-		//fmt::print("name: {}, interface: {}, version: {}\n", name, interface, version);
+		fmt::print("name: {}, interface: {}, version: {}\n", name, interface, version);
 		if(interface == compositor_t::interface_name)
 			registry.bind(name, compositor, version);
+		else if(interface == subcompositor_t::interface_name)
+			registry.bind(name, subcompositor, version);
 		else if(interface == xdg_wm_base_t::interface_name)
 			registry.bind(name, xdg_wm_base, version);
 		else if(interface == shm_t::interface_name)

@@ -23,5 +23,5 @@ SharedMemory::SharedMemory(int size) : size{size} {
 }
 
 SharedMemory::~SharedMemory() {
-	delete mem;
+	munmap(mem, size);
 }

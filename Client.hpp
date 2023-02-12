@@ -40,6 +40,7 @@ private:
 	display_t display;
 	registry_t registry;
 	compositor_t compositor;
+	subcompositor_t subcompositor;
 	xdg_wm_base_t xdg_wm_base;
 	shm_t shm;
 	output_t output;

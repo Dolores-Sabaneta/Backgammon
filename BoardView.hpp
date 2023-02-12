@@ -24,9 +24,9 @@ private:
 public:
 	BoardView();
 	void draw(std::vector<int8_t> &position, surface_t &surface, void *mem);
-	void start_hover(std::vector<int8_t> &position, surface_t &surface, void *mem, int point, int checker, shm_t &shm, surface_t &hovering_surface);
-	void hover(int x, int y);
-	void stop_hover();
+	void start_hover(std::vector<int8_t> &position, surface_t &surface, void *mem, int point, int checker, bool color, shm_t &shm, surface_t &hovering_surface, subsurface_t &hovering_subsurface);
+	void hover(double x, double y, surface_t &surface);
+	void stop_hover(surface_t &surface, void *mem);
 	
 	bool is_hovering();
 };

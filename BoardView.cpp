@@ -41,7 +41,7 @@ void BoardView::draw(std::vector<int8_t> &position, surface_t &surface, void *me
 	int gravity = -80;
 	for(int i = 0; i < 24; i++) {
 		if(position[i] != 0) {
-			position[i] < 0 ? cr->set_source_rgb(0, 0, 1) : cr->set_source_rgb(1, 0, 0);		
+			position[i] < 0 ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);		
 			if(i < 12) {
 				i < 6 ? x = 1010 - i * 80 : x = 950 - i * 80;
 				y = 1010;
@@ -61,31 +61,71 @@ void BoardView::draw(std::vector<int8_t> &position, surface_t &surface, void *me
 	surface.commit();
 }
 
-void BoardView::start_hover(std::vector<int8_t> &position, surface_t &surface, void *mem, int point, int checker, shm_t &shm, surface_t &hovering_surface) {
+void BoardView::start_hover(std::vector<int8_t> &position, surface_t &surface, void *mem, int point, int checker, bool color, shm_t &shm, surface_t &hovering_surface, subsurface_t &hovering_subsurface) {
 	hovering = true;
-	fmt::print("a\n");
-	hovering_checker = new HoveringChecker(shm, hovering_surface);
-	fmt::print("b\n");
+	hovering_checker = new HoveringChecker(shm, hovering_surface, hovering_subsurface, point, checker, color);
 	int x = 0;
 	int y = 0;
 	if(point < 13) {
-		y = 650;
+		y = 1050 - checker * 80;
 		point < 7 ? x = 1050 - point * 80 : x = 990 - point * 80;
 	}else {
-		y = 30;
-		point < 19 ? x = 30 + (point - 12) * 80 : x = 90 + (point - 12) * 80;
+		y = checker * 80 - 50;
+		point < 19 ? x = 30 + (point - 13) * 80 : x = 90 + (point - 13) * 80;
 	}
 	fmt::print("point: {}, checker: {}, x: {}, y: {}\n", point, checker, x, y);
-	/*
-	for(int i = 0; i < position[point - 1] * 80; i++) {
+	
+	for(int i = 0; i < 80; i++) {
 		memcpy(static_cast<uint32_t *>(mem) + width * (i + y) + x, image[i + y] + x * 4, 80 * 4);
-	}
-	surface.damage(0,0,80,80);
+	}	
+	hovering_checker->set_x(x);
+	hovering_checker->set_y(y);
+	
+	
+	Cairo::RefPtr<Cairo::ImageSurface> imageSurface = Cairo::ImageSurface::create((unsigned char *)hovering_checker->get_mem(), Cairo::FORMAT_ARGB32, 80, 80, 80 * 4);
+	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(imageSurface);
+	color == 0 ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);
+	
+	cr->arc(40, 40, 40, 0, 2 * M_PI);
+	cr->fill();
+	
+	//memset(hovering_checker->get_mem(), 0xFFFFFFFF, 80 * 80 * 4);
+	hovering_subsurface.set_position(x, y);	
+	hovering_surface.damage(0, 0, 80, 80);
+	hovering_surface.commit();
+	
+	surface.damage(x, y, 80, 80);
 	surface.commit();
-	*/
 }
-
-void BoardView::stop_hover() {
+void BoardView::hover(double x, double y, surface_t &surface) {
+	hovering_checker->set_x(hovering_checker->get_x() + x);
+	hovering_checker->set_y(hovering_checker->get_y() + y);
+	hovering_checker->get_subsurface().set_position(hovering_checker->get_x(), hovering_checker->get_y());
+	surface.commit();
+}
+void BoardView::stop_hover(surface_t &surface, void *mem) {
+	
+	int x = 0;
+	int y = 0;
+	int point = hovering_checker->get_point();
+	int checker = hovering_checker->get_checker();
+	if(point < 13) {
+		y = 1050 - checker * 80;
+		point < 7 ? x = 1050 - point * 80 : x = 990 - point * 80;
+	}else {
+		y = checker * 80 - 50;
+		point < 19 ? x = 30 + (point - 13) * 80 : x = 90 + (point - 13) * 80;
+	}
+	int stride = width * 4;
+	Cairo::RefPtr<Cairo::ImageSurface> imageSurface = Cairo::ImageSurface::create((unsigned char *)mem, Cairo::FORMAT_ARGB32, width, height, stride);
+	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(imageSurface);
+	hovering_checker->get_color() == 0 ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);
+	cr->arc(x + 40, y + 40, 40, 0, 2 * M_PI);
+	cr->fill();
+ 
+	surface.damage(x, y, 80, 80);
+	surface.commit();
+	
 	hovering = false;
 	delete hovering_checker;
 }

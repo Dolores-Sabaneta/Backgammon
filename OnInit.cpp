@@ -3,7 +3,7 @@
 void Client::OnInit() {
 	registry = display.get_registry();
 	registry.on_global() = [&] (uint32_t name, const std::string &interface, uint32_t version) {
-		fmt::print("name: {}, interface: {}, version: {}\n", name, interface, version);
+		//fmt::print("name: {}, interface: {}, version: {}\n", name, interface, version);
 		if(interface == compositor_t::interface_name)
 			registry.bind(name, compositor, version);
 		else if(interface == subcompositor_t::interface_name)
@@ -40,6 +40,7 @@ void Client::OnInit() {
 	cursor_t cursor = cursor_theme.get_cursor("cross");
 	cursor_image = cursor.image(0);
 	cursor_buffer = cursor_image.get_buffer();
-	cursor_surface = compositor.create_surface(); 
-	board_view.draw(board.get_position(), surface, memory.get_mem());
+	cursor_surface = compositor.create_surface();
+	board_view.init(surface, memory.get_mem());
+	board_view.draw(board.get_position());
 }

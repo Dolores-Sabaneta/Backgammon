@@ -1,24 +1,27 @@
 #include "HoveringChecker.hpp"
 
-HoveringChecker::HoveringChecker(shm_t &shm, surface_t &surface, subsurface_t &subsurface, int point, int checker, bool color) : surface{surface}, subsurface{subsurface}, point{point}, checker{checker}, color{color}, memory(80 * 80 * 4){
-	pool = shm.create_pool(memory.get_fd(), 80 * 80 * 4);
-	buffer = pool.create_buffer(0, 80, 80, 80 * 4, shm_format::argb8888);
-	surface.attach(buffer, 0, 0);
-	subsurface.set_desync();
-	//memset(memory.get_mem(), 0xFFFFFFFF, 80 * 80 * 4);
-	//surface.damage(0, 0, 80, 80);
-	//surface.commit();
+HoveringChecker::HoveringChecker(int point, int checker, bool color) : point{point}, checker{checker}, color{color} {
+	background = new unsigned char[80 * 80 * 4];
+	
+	if(point < 13) {
+		y = 1050 - checker * 80;
+		point < 7 ? x = 1050 - point * 80 : x = 990 - point * 80;
+	}else {
+		y = checker * 80 - 50;
+		point < 19 ? x = (point - 13) * 80 + 30 : x = (point - 13) * 80 + 90;
+	}
+}
+void HoveringChecker::set_background(void *mem, double movement_x, double movement_y) {
+	x += movement_x;
+	y += movement_y;
+	fmt::print("x: {:.2f}, y: {:.2f}, intx: {}, inty: {}\n",x,y,(int)x, (int)y);
+	for(int i{0}; i < 80; ++i) {
+		memcpy(background + i * 80 * 4, (unsigned char *)mem + 4 * 1080 * (i + (int)y) + (int)x * 4, 80 * 4);
+	}
 }
 
-surface_t &HoveringChecker::get_surface() {
-	return surface;
-}
-subsurface_t &HoveringChecker::get_subsurface() {
-	return subsurface;
-}
-
-void *HoveringChecker::get_mem() {
-	return memory.get_mem();
+unsigned char *HoveringChecker::get_background() {
+	return background;
 }
 int HoveringChecker::get_point() {
 	return point;
@@ -29,21 +32,12 @@ int HoveringChecker::get_checker() {
 bool HoveringChecker::get_color() {
 	return color;
 }
-double HoveringChecker::get_x(){
+double HoveringChecker::get_x() {
 	return x;
 }
 double HoveringChecker::get_y() {
 	return y;
 }
-void HoveringChecker::set_x(double x) {
-	this->x = x;
-}
-void HoveringChecker::set_y(double y) {
-	this->y = y;
-}
-
-
-
 HoveringChecker::~HoveringChecker() {
-
+	delete[] background;
 }

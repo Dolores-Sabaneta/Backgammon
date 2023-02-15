@@ -35,14 +35,22 @@ void BoardView::draw(std::vector<int8_t> &position, surface_t &surface, void *me
 	
 	Cairo::RefPtr<Cairo::ImageSurface> imageSurface = Cairo::ImageSurface::create((unsigned char *)mem, Cairo::FORMAT_ARGB32, width, height, stride);
 	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(imageSurface);
-	
+	FT_Library library;
+	FT_Face face;
+	FT_Init_FreeType(&library);
+	FT_New_Face(library, "Roboto-Black.ttf", 0, &face);
+	FT_Set_Pixel_Sizes(face, 0, 32);
+	cr->select_font_face("Roboto-Black", Cairo::FONT_SLANT_NORMAL,
+	Cairo::FONT_WEIGHT_BOLD);
+	cr->set_font_size(64);
+
 	int x = 1010;
 	int y = 1010;
 	int gravity = -80;
 	for(int i = 0; i < 24; i++) {
 		if(position[i] != 0) {
 			position[i] < 0 ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);		
-			if(i < 12) {
+			if(i < 12) {		
 				i < 6 ? x = 1010 - i * 80 : x = 950 - i * 80;
 				y = 1010;
 			}else if(i < 24) {
@@ -50,10 +58,15 @@ void BoardView::draw(std::vector<int8_t> &position, surface_t &surface, void *me
 				y = 70;
 				gravity = 80;
 			}
-			for(int j = 0; j < abs(position[i]); j++){
+			for(int j = 0; j < std::min(abs(position[i]), 5); j++){
 				cr->arc(x, y, 40, 0, 2 * M_PI);
 				y += gravity;
 				cr->fill();
+			}
+			if(abs(position[i]) > 5) {
+				cr->set_source_rgb(1, 1, 1);
+				i < 12 ? cr->move_to(x - 22, y + 104) : cr->move_to(x - 22, y - 56);
+				cr->show_text(fmt::format("{}", abs(position[i])));
 			}
 		}
 	}
@@ -75,16 +88,34 @@ void BoardView::start_hover(std::vector<int8_t> &position, surface_t &surface, v
 	}
 	fmt::print("point: {}, checker: {}, x: {}, y: {}\n", point, checker, x, y);
 	
-	for(int i = 0; i < 80; i++) {
-		memcpy(static_cast<uint32_t *>(mem) + width * (i + y) + x, image[i + y] + x * 4, 80 * 4);
-	}	
-	hovering_checker->set_x(x);
-	hovering_checker->set_y(y);
-	
-	
 	Cairo::RefPtr<Cairo::ImageSurface> imageSurface = Cairo::ImageSurface::create((unsigned char *)hovering_checker->get_mem(), Cairo::FORMAT_ARGB32, 80, 80, 80 * 4);
 	Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(imageSurface);
 	color == 0 ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);
+	
+	if(abs(position[point - 1]) < 6) {
+		for(int i = 0; i < 80; i++) {
+			memcpy(static_cast<uint32_t *>(mem) + width * (i + y) + x, image[i + y] + x * 4, 80 * 4);
+		}
+	}else {
+		cr->arc(40, 40, 40, 0, 2 * M_PI);
+		cr->fill();
+		if(abs(position[point - 1]) > 6) {
+			FT_Library library;
+			FT_Face face;
+			FT_Init_FreeType(&library);
+			FT_New_Face(library, "Roboto-Black.ttf", 0, &face);
+			FT_Set_Pixel_Sizes(face, 0, 32);
+			cr->select_font_face("Roboto-Black", Cairo::FONT_SLANT_NORMAL,
+			Cairo::FONT_WEIGHT_BOLD);
+			cr->set_font_size(64);
+			cr->set_source_rgb(1, 1, 1);
+			cr->show_text(fmt::format("{}", abs(position[point - 1]) - 1));
+		}
+	}
+		
+	hovering_checker->set_x(x);
+	hovering_checker->set_y(y);
+	
 	
 	cr->arc(40, 40, 40, 0, 2 * M_PI);
 	cr->fill();

@@ -11,6 +11,9 @@
 
 #include <cairomm/surface.h>
 #include <cairomm/context.h>
+#include <cairo-ft.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include "SharedMemory.hpp"
 #include "HoveringChecker.hpp"
 

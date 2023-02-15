@@ -16,7 +16,7 @@ using namespace wayland;
 
 class Board {
 private:	
-	std::vector<int8_t> position {2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 5, -5, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, -2, 0, 0, 0, 0};
+	std::vector<int8_t> position {2, 0, 0, 0, 0, -5, 0, -3, 0, 0, 0, 6, -7, 0, 0, 0, 3, 0, 7, 0, 0, 0, 0, -2, 0, 0, 0, 0};
 
 public:
 	Board();

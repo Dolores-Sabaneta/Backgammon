@@ -34,7 +34,7 @@ public:
 	void draw(std::vector<int8_t> &position);
 	
 	void checker_pressed(std::vector<int8_t> &position, double cur_x, double cur_y);
-	void checker_hover(double movement_x, double movement_y);
+	void checker_hover(double cur_x, double cur_y);
 	void checker_off(std::vector<int8_t> &position);
 	bool is_hovering();
 };

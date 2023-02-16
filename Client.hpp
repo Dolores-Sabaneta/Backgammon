@@ -34,7 +34,7 @@ class Client {
 private:
 	bool running;
 	
-	int width = 1080;
+	int width = 1920;
 	int height = 1080;
 	//global objects
 	display_t display;
@@ -52,6 +52,7 @@ private:
 	xdg_toplevel_t xdg_toplevel;
 	shm_pool_t pool;
 	buffer_t buffer;
+	keyboard_t keyboard;
 	pointer_t pointer;
 	cursor_image_t cursor_image;
 	buffer_t cursor_buffer;

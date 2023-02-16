@@ -23,7 +23,7 @@ void Client::OnInit() {
 	xdg_surface = xdg_wm_base.get_xdg_surface(surface);
 	xdg_surface.on_configure() = [&] (uint32_t serial) {xdg_surface.ack_configure(serial);};
 	xdg_toplevel  = xdg_surface.get_toplevel();
-	//xdg_toplevel.set_fullscreen(output);
+	xdg_toplevel.set_fullscreen(output);
 	xdg_toplevel.on_close() = [&] () {running = false;};
 	surface.commit();
 	display.roundtrip();
@@ -35,6 +35,7 @@ void Client::OnInit() {
 	buffer = pool.create_buffer(0, width, height, stride, shm_format::argb8888);
 	surface.attach(buffer, 0, 0);
 	
+	keyboard = seat.get_keyboard();
 	pointer = seat.get_pointer();
 	cursor_theme_t cursor_theme = cursor_theme_t("default", 16, shm);
 	cursor_t cursor = cursor_theme.get_cursor("cross");

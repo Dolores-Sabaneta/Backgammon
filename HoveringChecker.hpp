@@ -32,16 +32,20 @@ class HoveringChecker{
 private:
 	int point, checker;
 	double x, y;
+	double offset_x, offset_y;
 	bool color;
 	unsigned char *background;
 public:
-	HoveringChecker(int point, int checker, bool color);
+	HoveringChecker(int point, int checker, bool color, double offset_x, double offset_y);
 	~HoveringChecker();
 	int get_point();
 	int get_checker();
 	bool get_color();
-	void set_background(void *mem, double movement_x, double movement_y);
+	void set_background(void *mem, double cur_x, double cur_y);
 	unsigned char *get_background();
 	double get_x();
 	double get_y();
+	double get_x_offset();
+	double get_y_offset();
+	bool is_drawable(double cur_x, double cur_y);
 };

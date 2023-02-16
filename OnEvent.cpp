@@ -16,10 +16,18 @@ void Client::OnEvent() {
 		}
 	};
 	pointer.on_motion() = [&] (uint32_t, double x, double y) {
-		if(x < 1080 && x > 0 && y < 1080 && y > 0) {
-			if(board_view.is_hovering()) board_view.checker_hover(x - cur_x, y - cur_y);
+			if(board_view.is_hovering()) board_view.checker_hover(x, y);
 			cur_x = x;
 			cur_y = y;
+	};
+	keyboard.on_key() = [&] (uint32_t , uint32_t , uint32_t key, keyboard_key_state state) {
+		if(key == KEY_Q && state == keyboard_key_state::pressed) {
+			running = false;
+		}else if(key == KEY_F && state == keyboard_key_state::pressed) {
+			xdg_toplevel.set_fullscreen(output);
+		}else if(key == KEY_D && state == keyboard_key_state::pressed) {
+			xdg_toplevel.unset_fullscreen();
 		}
+	
 	};
 }

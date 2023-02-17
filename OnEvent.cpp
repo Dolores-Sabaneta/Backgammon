@@ -10,9 +10,9 @@ void Client::OnEvent() {
 	};
 	pointer.on_button() = [&] (uint32_t serial, uint32_t /*unused*/, uint32_t button, pointer_button_state state) {      
 		if(button == BTN_LEFT && state == pointer_button_state::pressed) {
-			board_view.checker_pressed(board.get_position(), cur_x, cur_y);
+			board_view.checker_pressed(cur_x, cur_y);
 		}else if(button == BTN_LEFT && state == pointer_button_state::released) {
-			if(board_view.is_hovering()) board_view.checker_off(board.get_position());
+			if(board_view.is_hovering()) board_view.checker_off(cur_x, cur_y);
 		}
 	};
 	pointer.on_motion() = [&] (uint32_t, double x, double y) {

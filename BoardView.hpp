@@ -17,6 +17,7 @@
 #include FT_FREETYPE_H
 #include "SharedMemory.hpp"
 #include "HoveringChecker.hpp"
+#include "Board.hpp"
 
 using namespace wayland;
 class BoardView {
@@ -28,13 +29,17 @@ private:
 	surface_t surface;
 	void *mem;
 	bool hovering{false};
+	
+	Board board;
+	//std::vector<int8_t> state; //memory of what has been drawn, when position changes we only draw the changes
+	void draw_move(int source, int destination);
 public:
 	BoardView();
 	void init(surface_t &surface, void *mem);
-	void draw(std::vector<int8_t> &position);
+	void draw();
 	
-	void checker_pressed(std::vector<int8_t> &position, double cur_x, double cur_y);
+	void checker_pressed(double cur_x, double cur_y);
 	void checker_hover(double cur_x, double cur_y);
-	void checker_off(std::vector<int8_t> &position);
+	void checker_off(double cur_x, double cur_y);
 	bool is_hovering();
 };

@@ -21,7 +21,7 @@ void HoveringChecker::set_background(void *mem, double cur_x, double cur_y) {
 		y = limit_y;
 	}else limit_y <= 0 ? y = 0 : y = 980;
 	
-	fmt::print("x: {}, y: {}, cur_x: {}, cur_y: {}, offset_x: {}, offset_y: {}\n", x, y, cur_x, cur_y, offset_x, offset_y);
+	//fmt::print("x: {}, y: {}, cur_x: {}, cur_y: {}, offset_x: {}, offset_y: {}\n", x, y, cur_x, cur_y, offset_x, offset_y);
 	for(int i{0}; i < 100; ++i) {
 		memcpy(background + i * 100 * 4, (unsigned char *)mem + 4 * 1920 * (i + (int)y) + (int)x * 4, 100 * 4);
 	}

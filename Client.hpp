@@ -63,8 +63,6 @@ private:
 	void OnEvent();
 	
 	BoardView board_view;
-	Board board;
-	
 	double cur_x, cur_y;
 	bool pressed;
 	

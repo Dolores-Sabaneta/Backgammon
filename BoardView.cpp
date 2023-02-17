@@ -46,7 +46,8 @@ void BoardView::init(surface_t &surface, void *mem){
 	Cairo::FONT_WEIGHT_BOLD);
 	cr->set_font_size(96);
 }
-void BoardView::draw(std::vector<int8_t> &position) {
+void BoardView::draw() {
+	std::vector<int8_t> position = board.get_position();
 	int stride = width * 4;
 	//draw the board image
 	for(int i = 0; i < height; i++) {
@@ -70,7 +71,6 @@ void BoardView::draw(std::vector<int8_t> &position) {
 			}
 			int gravity = point < 13 ? (-100) : 100;
 			for(int j {0}; j < std::min(abs(position[point - 1]), 5); ++j){
-				fmt::print("x: {}, y: {}\n", x, y);
 				cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
 				cr->fill();
 				y += gravity;
@@ -89,7 +89,8 @@ void BoardView::draw(std::vector<int8_t> &position) {
 	surface.commit();
 }
 
-void BoardView::checker_pressed(std::vector<int8_t> &position, double cur_x, double cur_y) {
+void BoardView::checker_pressed(double cur_x, double cur_y) {
+	std::vector<int8_t> position = board.get_position();
 	double x{0};
 	double y{0};
 	//convert cur_x and cur_y to continuous line of points to detect a press more easly
@@ -108,7 +109,6 @@ void BoardView::checker_pressed(std::vector<int8_t> &position, double cur_x, dou
 			x = cur_x + 830;
 		}
 	}
-	fmt::print("x: {}, y: {}\n", x, y);
 	
 	//check checker slot contains a checker
 	int point = x / 100 + 1;
@@ -156,7 +156,6 @@ void BoardView::checker_pressed(std::vector<int8_t> &position, double cur_x, dou
 }
 
 void BoardView::checker_hover(double cur_x, double cur_y) {
-	fmt::print("is drawable: {}\n", hovering_checker->is_drawable(cur_x, cur_y));
 	if(hovering_checker->is_drawable(cur_x, cur_y)) {	
 		double x = hovering_checker->get_x();
 		double y = hovering_checker->get_y();
@@ -177,7 +176,10 @@ void BoardView::checker_hover(double cur_x, double cur_y) {
 	}
 }
 
-void BoardView::checker_off(std::vector<int8_t> &position) {
+void BoardView::checker_off(double cur_x, double cur_y) {
+	std::vector<int8_t> position = board.get_position();
+	
+	//draw image over last position of hovering checker
 	double buffer_x = hovering_checker->get_x();
 	double buffer_y = hovering_checker->get_y();
 	unsigned char *background = hovering_checker->get_background();
@@ -185,26 +187,87 @@ void BoardView::checker_off(std::vector<int8_t> &position) {
 		memcpy((unsigned char*)mem+4*width*(i+(int)buffer_y)+(int)buffer_x*4, background+4*100*i,100*4);
 	}
 	
+	//convert cur_x and cur_y to destination point
+	int destination;
+	if(cur_y < 1070 && cur_y > 570) {
+		if(cur_x < 1730 && cur_x > 1130) {
+			destination = (-cur_x + 1730) / 100 + 1;
+		}else if(cur_x < 970 && cur_x > 370) {
+			destination = (-cur_x + 1570) / 100 + 1;
+		}
+	}else if(cur_y < 500 && cur_y > 0) {
+		if(cur_x < 1730 && cur_x > 1130) {
+			destination = (cur_x + 670) / 100 + 1;
+		}else if(cur_x < 970 && cur_x > 370) {
+			destination = (cur_x + 830) / 100 + 1;
+		}
+	}
+	//draw the hovering checker on source if it is not top checker
 	int point = hovering_checker->get_point();
 	int checker = hovering_checker->get_checker();
 	int x,y;
-	if(point < 13) {
-		y = 1080 - checker * 100;
-		point < 7 ? x = 1740 - point * 100 : x = 1580 - point * 100;
-	}else {
-		y = checker * 100 - 100;
-		point < 19 ? x = (point - 13) * 100 + 380 : x = (point - 13) * 100 + 540;
-	}
-	hovering_checker->get_color() ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);
-	cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
-	cr->fill();
-	
-	if(abs(position[point - 1]) > 5 && checker == 5) {
-		cr->set_source_rgb(1, 1, 1);
-		cr->move_to(x + 18, y + 86);
-		cr->show_text(fmt::format("{}", abs(position[point - 1])));
-	}
+	if(checker < 5 && checker < abs(position[point - 1])) {
+		if(point < 13) {
+			y = 1080 - checker * 100;
+			point < 7 ? x = 1740 - point * 100 : x = 1580 - point * 100;
+		}else {
+			y = checker * 100 - 100;
+			point < 19 ? x = (point - 13) * 100 + 380 : x = (point - 13) * 100 + 540;
+		}
+		hovering_checker->get_color() ? cr->set_source_rgb(1, 0, 0) : cr->set_source_rgb(0, 0, 1);
+		cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
+		cr->fill();
+	}	
+	fmt::print("source: {}, destination: {}\n", hovering_checker->get_point(), destination);
+	try {
+		board.move(hovering_checker->get_point(), destination);
 		
+		//if source top checker is 5 or less but not hovering_checker remove it
+		if(position[point - 1] + 1 < 6 && position[point - 1] + 1 != checker) {
+			checker = position[point - 1] + 1;
+			if(point < 13) {
+				y = 1080 - checker * 100;
+				point < 7 ? x = 1740 - point * 100 : x = 1580 - point * 100;
+			}else {
+				y = checker * 100 - 100;
+				point < 19 ? x = (point - 13) * 100 + 380 : x = (point - 13) * 100 + 540;
+			}
+			for(int i{0}; i < 100; ++i) {
+				memcpy((unsigned char *)mem + 4 * width * (i + y) + x * 4, image[i + y] + 4 * x, 100 * 4);
+			}
+		}
+		
+		//draw destination checker
+		point = destination;
+		checker = std::min(abs(position[point - 1]) + 1, 5);
+		fmt::print("point: {}, checker: {}\n", point, checker);
+		if(point < 13) {
+			y = 1080 - checker * 100;
+			point < 7 ? x = 1740 - point * 100 : x = 1580 - point * 100;
+		}else {
+			y = checker * 100 - 100;
+			point < 19 ? x = (point - 13) * 100 + 380 : x = (point - 13) * 100 + 540;
+		}
+		cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
+		cr->fill();
+			if(abs(position[point - 1]) + 1 > 5) {
+				cr->set_source_rgb(1, 1, 1);
+				cr->move_to(x + 18, y + 86);
+				cr->show_text(fmt::format("{}", abs(position[point - 1]) + 1));
+			}
+	}catch (std::invalid_argument &e) {
+		fmt::print("error: {}\n", e.what());
+		//draw source top checker if the move was invalid
+		if(checker == abs(position[point - 1])) {
+			cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
+			cr->fill();	
+		}
+		if(checker > 5) {
+			cr->set_source_rgb(1, 1, 1);
+			cr->move_to(x + 18, y + 86);
+			cr->show_text(fmt::format("{}", abs(position[point - 1])));
+		}
+	}	
 	surface.damage(0,0,1920,1080);
 	surface.commit();
 	
@@ -215,4 +278,54 @@ void BoardView::checker_off(std::vector<int8_t> &position) {
 
 bool BoardView::is_hovering() {
 	return hovering;
+}
+
+void BoardView::draw_move(int source, int destination) {
+	std::vector<int8_t> position = board.get_position();
+	
+	//check hovering checker is not top checker
+	int x, y;
+	int point = source;
+	int checker = std::min(abs(position[point - 1]) + 1, 5);
+	if(point < 13) {
+		y = 1080 - checker * 100;
+		point < 7 ? x = 1740 - point * 100 : x = 1580 - point * 100;
+	}else {
+		y = checker * 100 - 100;
+		point < 19 ? x = (point - 13) * 100 + 380 : x = (point - 13) * 100 + 540;
+	}
+	//draw source checker back if it is not top checker
+	position[point - 1] < 0 ? cr->set_source_rgb(1,0,0): cr->set_source_rgb(0,0,1);
+	if(abs(position[point - 1]) + 1 > 5) {
+		cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
+		cr->fill();
+		if(abs(position[point - 1]) + 1 > 6) {
+			cr->set_source_rgb(1, 1, 1);
+			cr->move_to(x + 18, y + 86);
+			cr->show_text(fmt::format("{}", abs(position[point - 1]) - 1));
+		}
+	}else {
+		for(int i{0}; i < 100; ++i) {
+			memcpy((unsigned char *)mem + 4 * width * (i + y) + x * 4, image[i + y] + 4 * x, 100 * 4);
+		}
+	}
+	
+	//draw top checker at destination
+	point = destination;
+	checker = std::min(abs(position[point - 1]), 5);
+	if(point < 13) {
+		y = 1080 - checker * 100;
+	point < 7 ? x = 1740 - point * 100 : x = 1580 - point * 100;
+		}else {
+	y = checker * 100 - 100;
+		point < 19 ? x = (point - 13) * 100 + 380 : x = (point - 13) * 100 + 540;
+	}
+	position[point - 1] < 0 ? cr->set_source_rgb(1,0,0) : cr->set_source_rgb(0,0,1);
+	cr->arc(x + 50, y + 50, 50, 0, 2 * M_PI);
+	cr->fill();
+	if(abs(position[point - 1]) > 5) {
+		cr->set_source_rgb(1, 1, 1);
+		cr->move_to(x + 18, y + 86);
+		cr->show_text(fmt::format("{}", abs(position[point - 1])));
+	}
 }

@@ -23,7 +23,7 @@ void Client::OnInit() {
 	xdg_surface = xdg_wm_base.get_xdg_surface(surface);
 	xdg_surface.on_configure() = [&] (uint32_t serial) {xdg_surface.ack_configure(serial);};
 	xdg_toplevel  = xdg_surface.get_toplevel();
-	xdg_toplevel.set_fullscreen(output);
+	//xdg_toplevel.set_fullscreen(output);
 	xdg_toplevel.on_close() = [&] () {running = false;};
 	surface.commit();
 	display.roundtrip();

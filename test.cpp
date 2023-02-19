@@ -1,10 +1,21 @@
 //#include <wayland-client-protocol.hpp>
 //#include <wayland-client.hpp>
 //#include <wayland-client-protocol-extra.hpp>
-#include <cairomm/surface.h>
+//#include <cairomm/surface.h>
+#include <vector>
+
+class Ball {
+
+public:
+	std::vector<int> &get_position() {
+		return position;
+	}
+private:
+	std::vector<int> position{1,2,3};
+};
 
 int main() {
-	int stride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, 14);
+	Ball ball;
 
 	return 0;
 }

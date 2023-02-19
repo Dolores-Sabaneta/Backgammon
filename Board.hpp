@@ -16,7 +16,7 @@ using namespace wayland;
 
 class Board {
 private:	
-	std::vector<int8_t> position {2, 0, 0, 0, 0, -8, 0, -3, 0, 0, 0, 8, -7, 0, 0, 0, 3, 0, 7, 0, 0, 0, 0, -2, 0, 0, 0, 0};
+	std::vector<int8_t> position {2, 0, 0, 0, 0, -8, 0, -3, 0, 0, 0, 8, -5, 0, 0, 0, 6, 0, 6, 0, 0, 0, 0, -2, 0, 0, 0, 0};
 	std::pair<uint8_t, uint8_t> dice;
 	std::vector<uint8_t> available;
 	//0 is white, 1 is black

@@ -31,8 +31,9 @@ private:
 	bool hovering{false};
 	
 	Board board;
-	//std::vector<int8_t> state; //memory of what has been drawn, when position changes we only draw the changes
-	void draw_move(int source, int destination);
+	void draw_checker(int x, int y, bool color);
+	void draw_number(int x, int y, int checker);
+	void remove_checker(int x, int y);
 public:
 	BoardView();
 	void init(surface_t &surface, void *mem);

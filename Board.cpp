@@ -28,6 +28,11 @@ void Board::move(int source, int destination) {
 	
 	}else throw std::invalid_argument("source and destination are not same color");
 	
+	//check source and destination are not the same
+	if(source != destination) {
+	
+	}else throw std::invalid_argument("source and destination are the same");
+	
 	if(position[source - 1] < 0) {
 		position[source - 1]++;
 		position[destination - 1]--;
